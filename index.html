@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telinha v4.0 OS</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --border: #334155;
+        }
+
+        body.light-mode {
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background-color: var(--border);
+        }
+
+        button.primary {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+        }
+
+        button.primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .survival-active {
+            border: 2px solid var(--danger) !important;
+            background-color: rgba(239, 68, 68, 0.1) !important;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .full-width {
+                grid-column: span 2;
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text-primary);
+        }
+
+        .chico-console textarea {
+            width: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            resize: vertical;
+            min-height: 80px;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li.task-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        li.task-item:last-child {
+            border-bottom: none;
+        }
+
+        li.task-item.completed span {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .semaforo-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .semaforo-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.4;
+        }
+
+        .semaforo-btn.active {
+            opacity: 1;
+            border-color: var(--text-primary);
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .btn-verde { background-color: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .btn-amarelo { background-color: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .btn-vermelho { background-color: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+        body.survival-mode .hide-in-survival {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>⚡ Telinha v4.0 OS</h1>
+        <div class="controls">
+            <button id="survivalBtn" onclick="toggleSurvivalMode()">🚨 Modo Sobrevivência</button>
+            <button onclick="toggleTheme()">☀️/🌙</button>
+        </div>
+    </header>
+
+    <div class="grid">
+
+        <!-- Console Chico AI -->
+        <div class="card full-width chico-console">
+            <h2>🔥 Console Chico AI ('Fogo de Chão')</h2>
+            <textarea id="chicoInput" placeholder="Descarregue sua mente aqui... (Ex: 'Preciso preparar o treino do CDT, lavar a louça e organizar o cronograma')"></textarea>
+            <button class="primary" onclick="processChicoInput()">Processar & Fatiar para o Top 3</button>
+        </div>
+
+        <!-- Top 3 Foco Absoluto -->
+        <div class="card">
+            <h2>🎯 Top 3 Foco Absoluto</h2>
+            <ul id="top3List">
+                <!-- Preenchido via JavaScript -->
+            </ul>
+        </div>
+
+        <!-- Módulo de Prontidão & sRPE -->
+        <div class="card hide-in-survival">
+            <h2>📊 Prontidão & sRPE (Carga de Treino)</h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px;">Como está sua fadiga hoje?</p>
+            <div class="semaforo-container">
+                <div class="semaforo-btn btn-verde" data-nivel="verde" onclick="setSemaforo('verde')">Verde (Pleno)</div>
+                <div class="semaforo-btn btn-amarelo" data-nivel="amarelo" onclick="setSemaforo('amarelo')">Amarelo (Alerta)</div>
+                <div class="semaforo-btn btn-vermelho" data-nivel="vermelho" onclick="setSemaforo('vermelho')">Vermelho (Fadiga)</div>
+            </div>
+        </div>
+
+        <!-- Rede de Apoio & Pets -->
+        <div class="card hide-in-survival">
+            <h2>🐾 Rede de Apoio & Pets (Nina & Tobias)</h2>
+            <ul id="petList">
+                <!-- Preenchido via JavaScript -->
+            </ul>
+        </div>
+
+        <!-- Projetos CDT & UERJ -->
+        <div class="card hide-in-survival">
+            <h2>📚 Projetos & Metas (CDT / Artigos)</h2>
+            <ul id="projetosList">
+                <!-- Preenchido via JavaScript -->
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        // Estado inicial da aplicação
+        let appData = JSON.parse(localStorage.getItem('telinha_data_v4')) || {
+            survivalMode: false,
+            darkMode: true,
+            semaforo: 'verde',
+            top3: [
+                { text: 'Finalizar planejamento de treinos CDT', done: false },
+                { text: 'Revisar cronograma da UERJ (3º Semestre)', done: false },
+                { text: 'Organizar rotina de cuidados dos pets (Nina & Tobias)', done: false }
+            ],
+            pets: [
+                { text: 'Alimentação (Ração urinary + Sachê)', done: false },
+                { text: 'Higienização da caixa de areia', done: false }
+            ],
+            projetos: [
+                { text: 'Pesquisa bibliográfica: Valências físicas no cheerleading', done: false },
+                { text: 'Alinhamento de turmas e horários de aula', done: false }
+            ]
+        };
+
+        function initApp() {
+            renderLists();
+            updateSemaforoUI();
+            if (appData.survivalMode) {
+                document.body.classList.add('survival-mode');
+                document.getElementById('survivalBtn').classList.add('survival-active');
+            }
+            if (!appData.darkMode) {
+                document.body.classList.add('light-mode');
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('telinha_data_v4', JSON.stringify(appData));
+        }
+
+        function renderLists() {
+            // Render Top 3
+            const top3El = document.getElementById('top3List');
+            top3El.innerHTML = appData.top3.map((item, index) => `
+                <li class="task-item ${item.done ? 'completed' : ''}">
+                    <input type="checkbox" ${item.done ? 'checked' : ''} onclick="toggleTask('top3', ${index})">
+                    <span>${item.text}</span>
+                </li>
+            `).join('');
+
+            // Render Pets
+            const petEl = document.getElementById('petList');
+            petEl.innerHTML = appData.pets.map((item, index) => `
+                <li class="task-item ${item.done ? 'completed' : ''}">
+                    <input type="checkbox" ${item.done ? 'checked' : ''} onclick="toggleTask('pets', ${index})">
+                    <span>${item.text}</span>
+                </li>
+            `).join('');
+
+            // Render Projetos
+            const projEl = document.getElementById('projetosList');
+            projEl.innerHTML = appData.projetos.map((item, index) => `
+                <li class="task-item ${item.done ? 'completed' : ''}">
+                    <input type="checkbox" ${item.done ? 'checked' : ''} onclick="toggleTask('projetos', ${index})">
+                    <span>${item.text}</span>
+                </li>
+            `).join('');
+        }
+
+        function toggleTask(category, index) {
+            appData[category][index].done = !appData[category][index].done;
+            saveData();
+            renderLists();
+        }
+
+        function toggleSurvivalMode() {
+            appData.survivalMode = !appData.survivalMode;
+            document.body.classList.toggle('survival-mode');
+            document.getElementById('survivalBtn').classList.toggle('survival-active');
+            saveData();
+        }
+
+        function toggleTheme() {
+            appData.darkMode = !appData.darkMode;
+            document.body.classList.toggle('light-mode');
+            saveData();
+        }
+
+        function setSemaforo(nivel) {
+            appData.semaforo = nivel;
+            updateSemaforoUI();
+            saveData();
+        }
+
+        function updateSemaforoUI() {
+            document.querySelectorAll('.semaforo-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.dataset.nivel === appData.semaforo) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function processChicoInput() {
+            const input = document.getElementById('chicoInput');
+            const texto = input.value.trim();
+            if (!texto) return;
+
+            // Adiciona automaticamente o texto gerado ao Top 3
+            appData.top3.push({ text: texto, done: false });
+            // Mantém apenas os 3 primeiros se ultrapassar, ou expande o foco
+            if(appData.top3.length > 3) {
+                appData.top3.shift(); // Remove o mais antigo para manter o foco estrito no Top 3
+            }
+            
+            input.value = '';
+            saveData();
+            renderLists();
+            alert('🧠 Descarregado e fatiado com sucesso para o seu Top 3!');
+        }
+
+        // Inicializar ao carregar
+        initApp();
+    </script>
+</body>
+</html>
